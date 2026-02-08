@@ -1,6 +1,3 @@
-HEAD
-# career-builder
-=======
 # OpenCareer
 
 A web application that helps users discover career paths by analyzing their resume. Upload your PDF or DOC resume and get personalized career role suggestions. Upload a PDF or DOC file, and OpenCareer extracts skills and suggests relevant roles with clear explanations based on actual skills.
@@ -138,8 +135,3 @@ Includes 20 common tech roles:
 - Export results as PDF
 - Multi-language support
 - Non-tech roles
-
-## License
-
-MIT
-2533cf7 (Initial OpenCareer Implementation)
