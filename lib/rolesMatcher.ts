@@ -1,16 +1,16 @@
-import { roles } from './data/roles';
-import { MatchedRole } from '@/types';
+import { Role, MatchedRole } from '@/types';
 
 /**
  * Matches user skills to roles and calculates match scores
  * @param userSkills Array of skills the user possesses
+ * @param rolesData List of roles to match against
  * @returns Array of matched roles sorted by match percentage (highest first)
  */
-export function matchRoles(userSkills: string[]): MatchedRole[] {
+export function matchRoles(userSkills: string[], rolesData: Role[]): MatchedRole[] {
   const normalizedUserSkills = userSkills.map(s => s.toLowerCase());
   const matchedRoles: MatchedRole[] = [];
 
-  for (const role of roles) {
+  for (const role of rolesData) {
     // Find intersection: which required skills does the user have?
     const matchedSkills: string[] = [];
 

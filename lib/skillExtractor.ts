@@ -1,15 +1,16 @@
-import { skills } from './data/skills';
+import { Skill } from '@/types';
 
 /**
  * Extracts skills from resume text using keyword matching
  * @param text The resume text to extract skills from
+ * @param skillsData List of skills to match against
  * @returns Array of matched skill names
  */
-export function extractSkills(text: string): string[] {
+export function extractSkills(text: string, skillsData: Skill[]): string[] {
   const lowerText = text.toLowerCase();
   const foundSkills = new Set<string>();
 
-  for (const skill of skills) {
+  for (const skill of skillsData) {
     // Check the main skill name
     if (matchSkill(lowerText, skill.name)) {
       foundSkills.add(skill.name);

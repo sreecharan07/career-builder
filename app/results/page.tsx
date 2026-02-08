@@ -4,34 +4,57 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SkillsList from '@/components/SkillsList';
 import RoleCard from '@/components/RoleCard';
-import { MatchedRole } from '@/types';
+import { MatchedRole, Role } from '@/types';
 import { matchRoles } from '@/lib/rolesMatcher';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function ResultsPage() {
   const router = useRouter();
   const [skills, setSkills] = useState<string[]>([]);
   const [roles, setRoles] = useState<MatchedRole[]>([]);
+  const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load results from sessionStorage
-    const resultsStr = sessionStorage.getItem('analysisResults');
+    const initialize = async () => {
+      try {
+        // 1. Load results from sessionStorage
+        const resultsStr = sessionStorage.getItem('analysisResults');
 
-    if (!resultsStr) {
-      // No results found, redirect to home
-      router.push('/');
-      return;
-    }
+        if (!resultsStr) {
+          router.push('/');
+          return;
+        }
 
-    try {
-      const results = JSON.parse(resultsStr);
-      setSkills(results.skills);
-      setRoles(results.roles);
-      setLoading(false);
-    } catch (err) {
-      console.error('Failed to parse results:', err);
-      router.push('/');
-    }
+        const results = JSON.parse(resultsStr);
+        setSkills(results.skills);
+        setRoles(results.roles);
+
+        // 2. Fetch all roles from Supabase for recalculation
+        const { data: rolesData, error } = await supabase
+          .from('roles')
+          .select('title, description, required_skills');
+
+        if (error) {
+          console.error('Error fetching roles:', error);
+        } else if (rolesData) {
+          // Map to Role type
+          const formattedRoles: Role[] = rolesData.map((role: any) => ({
+            title: role.title,
+            description: role.description,
+            requiredSkills: role.required_skills || [],
+          }));
+          setAllRoles(formattedRoles);
+        }
+      } catch (err) {
+        console.error('Failed to parse results or fetch roles:', err);
+        router.push('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initialize();
   }, [router]);
 
   const handleRemoveSkill = (skillToRemove: string) => {
@@ -40,7 +63,8 @@ export default function ResultsPage() {
     setSkills(updatedSkills);
 
     // Recalculate role matches with remaining skills
-    const updatedRoles = matchRoles(updatedSkills);
+    // We need allRoles to be populated. If it failed to load, this might return empty matches.
+    const updatedRoles = matchRoles(updatedSkills, allRoles);
     setRoles(updatedRoles);
 
     // Update sessionStorage
