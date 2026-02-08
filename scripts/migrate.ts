@@ -1,15 +1,14 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { skills } from '../lib/data/skills';
 import { roles } from '../lib/data/roles';
-import * as dotenv from 'dotenv';
-import path from 'path';
+const path = require('path');
+const dotenv = require('dotenv');
 
 // Load environment variables from .env.local
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
     console.error('Error: Missing Supabase environment variables in .env.local');
@@ -42,15 +41,13 @@ async function migrate() {
     for (const role of roles) {
         const { error } = await supabase
             .from('roles')
-            .upsert({
+            .insert({
                 title: role.title,
                 description: role.description,
                 required_skills: role.requiredSkills
-            }, { onConflict: 'title' }); // Assuming title is unique for now, or we can just insert
+            });
 
         if (error) {
-            // If there's no unique constraint on title via index, upsert might not work as expected for duplicates without an ID.
-            // But for initial seeding, it's fine.
             console.error(`Error migrating role ${role.title}:`, error.message);
         }
     }
