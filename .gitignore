@@ -14,7 +14,12 @@ dist/
 downloads/
 eggs/
 .eggs/
+
+HEAD
 lib/
+=======
+# lib/ - commented out for Next.js projects
+2533cf7 (Initial OpenCareer Implementation)
 lib64/
 parts/
 sdist/
@@ -26,6 +31,30 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+HEAD
+=======
+# Next.js
+.next/
+out/
+node_modules/
+.DS_Store
+*.pem
+
+# Testing
+.turbo
+coverage
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Local env files
+.env*.local
+
+>>>>>>> 2533cf7 (Initial OpenCareer Implementation)
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
